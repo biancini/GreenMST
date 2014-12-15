@@ -45,7 +45,7 @@ public class TopologyCostsJSONDeserializer extends JsonDeserializer<TopologyCost
 
             String name = jParser.getCurrentName();
             jParser.nextToken();
-            if (jParser.getText().equals("")) {
+            if ("".equals(jParser.getText())) {
             	continue;
             }
             Integer value = Integer.parseInt(jParser.getText());

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonDeserialize(using=TopologyCostsJSONDeserializer.class)
 public class TopologyCosts {
 	
-	protected static Logger logger = LoggerFactory.getLogger(TopologyCosts.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TopologyCosts.class);
 	private static Map<String, Integer> costs = new HashMap<String, Integer>();
 	public static final int DEFAULT_COST = 1;
 	
@@ -37,12 +37,11 @@ public class TopologyCosts {
 		      costs.put(key, value);
 		    }
 		}  catch (IOException ex) {
-			logger.error("Error while reading nodecosts.properties file.", ex);
+			LOGGER.error("Error while reading nodecosts.properties file.", ex);
 		}
 	}
 	
 	public void setCostsValues(Map<String, Integer> map) {
-		//costs.clear();
 		costs.putAll(map);
 	}
 	
@@ -82,7 +81,7 @@ public class TopologyCosts {
 		
 		String s = "";
 		for (Entry<String, Integer> curProp: costs.entrySet()) {
-			if (!s.equals("")) {
+			if (!"".equals(s)) {
 				s += "\n";
 			}
 			s += curProp.getKey() + " => " + curProp.getValue();

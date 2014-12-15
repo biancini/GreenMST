@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TopoCostsResource extends ServerResource {
 	
-	protected Logger logger = LoggerFactory.getLogger(TopoCostsResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TopoCostsResource.class);
 	
     @Get("json")
     public List<TopologyCosts> retrieve() {
@@ -49,10 +49,10 @@ public class TopoCostsResource extends ServerResource {
         	IGreenMSTService service = (IGreenMSTService) getContext().getAttributes().get(IGreenMSTService.class.getCanonicalName());
         	service.setCosts(costs);
     		
-        	logger.debug("Loaded new node costs.\n{}", new Object[]{costs});
-    		return ("{\"status\" : \"new topology costs set\"}");
+        	LOGGER.debug("Loaded new node costs.\n{}", new Object[]{costs});
+    		return "{\"status\" : \"new topology costs set\"}";
         } catch (Exception e) {
-            logger.error("Error parsing new topology costs.", e);
+            LOGGER.error("Error parsing new topology costs.", e);
             return "{\"status\" : \"Error! Could not parse new topology costs, see log for details.\"}";
         }
         

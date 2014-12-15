@@ -6,6 +6,7 @@ import it.garr.greenmst.types.LinkWithCost;
 import it.garr.greenmst.types.TopologyCosts;
 import it.garr.greenmst.web.GreenMSTWebRoutable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFSwitch;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyListener {
 	
-	protected static Logger logger = LoggerFactory.getLogger(GreenMST.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GreenMST.class);
 	
 	// Service references
 	protected IRestApiService restApi = null;
@@ -62,62 +62,66 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	protected Set<LinkWithCost> redundantEdges = new HashSet<LinkWithCost>();
 	
 	private IMinimumSpanningTreeAlgorithm algorithm = new KruskalAlgorithm();
+	protected static boolean CLOSE_PORT = false;
 	
 	@Override
 	public void topologyChanged(List<LDUpdate> linkUpdates) {
 		for (LDUpdate update : linkUpdates) {
-			logger.trace("Received topology update event {}.", update);
+			LOGGER.trace("Received topology update event {}.", update);
 			
-			if (update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_REMOVED) || update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_UPDATED)) {
-				LinkWithCost link = new LinkWithCost(update.getSrc(), update.getSrcPort(), update.getDst(), update.getDstPort());
-				logger.trace("Considering link {}.", link);
-				
-				logger.trace("topoEdges = {}.", new Object[] { printEdges(topoEdges) });
-				logger.trace("redundantEdges = {}.", new Object[] { printEdges(redundantEdges) });
-				
-				if (update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_REMOVED)) {
-		            if ((topoEdges.contains(link) || topoEdges.contains(link.getInverse())) && 
-		            		!redundantEdges.contains(link) && !redundantEdges.contains(link.getInverse())) {	
-		            	logger.debug("Link removed: {}.", new Object[] { link });
-		            	topoEdges.remove(link);
-		            	updateLinks();
-		            }
-				} else if(update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_UPDATED)) {
-					if (!topoEdges.contains(link) && !topoEdges.contains(link.getInverse())) {
-						logger.debug("Link added: {}.", new Object[] { link });
-		                topoEdges.add(link);
-		                updateLinks();
-		            }
-				}
+			// Consider only link removed and link updated events, discard all others.
+			if (!update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_REMOVED) &&
+					!update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_UPDATED)) {
+				return;
+			}
+			
+			LinkWithCost link = new LinkWithCost(update.getSrc(), update.getSrcPort(), update.getDst(), update.getDstPort());
+			LOGGER.trace("Considering link {}.", link);
+			
+			LOGGER.trace("topoEdges = {}.", new Object[] { printEdges(topoEdges) });
+			LOGGER.trace("redundantEdges = {}.", new Object[] { printEdges(redundantEdges) });
+			
+			if (update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_REMOVED)) {
+	            if ((topoEdges.contains(link) || topoEdges.contains(link.getInverse())) && 
+	            		!redundantEdges.contains(link) && !redundantEdges.contains(link.getInverse())) {	
+	            	LOGGER.debug("Link removed: {}.", new Object[] { link });
+	            	topoEdges.remove(link);
+	            	updateLinks();
+	            }
+			} else if(update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_UPDATED)) {
+				if (!topoEdges.contains(link) && !topoEdges.contains(link.getInverse())) {
+					LOGGER.debug("Link added: {}.", new Object[] { link });
+	                topoEdges.add(link);
+	                updateLinks();
+	            }
 			}
 		}
 	}
 	
 	protected void updateLinks() {
-		logger.debug("Updating MST because of topology change...");
+		LOGGER.debug("Updating MST because of topology change...");
 		Set<LinkWithCost> oldRedundantEdges = this.redundantEdges,
 						  newRedundantEdges = null;
 		
         try {
         	List<LinkWithCost> allTopology = new ArrayList<LinkWithCost>(topoEdges);
-        	//allTopology.addAll(oldRedundantEdges);
-        	Vector<LinkWithCost> mstEdges = algorithm.perform(allTopology);
-        	logger.trace("mstEdges = {}.", new Object[] { printEdges(mstEdges) });
+        	List<LinkWithCost> mstEdges = algorithm.perform(allTopology);
+        	LOGGER.trace("mstEdges = {}.", new Object[] { printEdges(mstEdges) });
             // In mstEdges we now have all edges of the MST
             // topoEdges still contains a list of all edges of the known physical network   
         	newRedundantEdges = findRedundantEdges(mstEdges);
-        	logger.trace("newRedundantEdges = {}.", new Object[] { printEdges(newRedundantEdges) });
+        	LOGGER.trace("newRedundantEdges = {}.", new Object[] { printEdges(newRedundantEdges) });
             // redundantEdges contains edges to be closed according to Kruskal
             // (ie edges in topoEdges but not present in mstEdges, edges not in MSP and not already closed)
         } catch (Exception e) {
-            logger.error("Error calculating MST with Kruskal ", e);
+            LOGGER.error("Error calculating MST with Kruskal ", e);
         }
         
-        if (newRedundantEdges != null && newRedundantEdges.size() > 0) {
+        if (newRedundantEdges != null && !newRedundantEdges.isEmpty()) {
             // Close edges in redundantEdges
             for (LinkWithCost s : newRedundantEdges) {
                 if (!oldRedundantEdges.contains(s)) {
-                	logger.trace("Closing edge {}.", new Object[] { s });
+                	LOGGER.trace("Closing edge {}.", new Object[] { s });
 
                 	modPort(s.getSrc(), s.getSrcPort(), false);
                 	modPort(s.getDst(), s.getDstPort(), false);
@@ -128,7 +132,7 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
             // (ie edges in the redundantEdges, from previous execution, and not in the current execution)
             for (LinkWithCost s : oldRedundantEdges) {
                 if (!newRedundantEdges.contains(s)) {
-                	logger.trace("Opening edge {}.", new Object[] { s });
+                	LOGGER.trace("Opening edge {}.", new Object[] { s });
                 	
             		modPort(s.getSrc(), s.getSrcPort(), true);
             		modPort(s.getDst(), s.getDstPort(), true);
@@ -139,21 +143,21 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
             this.redundantEdges = newRedundantEdges;
         }
         
-        logger.trace("New topoEdges = {}.", new Object[] { printEdges(topoEdges) });
-        logger.trace("New redundantEdges = {}.", new Object[] { printEdges(redundantEdges) });
+        LOGGER.trace("New topoEdges = {}.", new Object[] { printEdges(topoEdges) });
+        LOGGER.trace("New redundantEdges = {}.", new Object[] { printEdges(redundantEdges) });
     }
 	
-	protected Set<LinkWithCost> findRedundantEdges(Vector<LinkWithCost> mstEdges) {
-    	Set<LinkWithCost> redundantEdges = new HashSet<LinkWithCost>();
+	protected Set<LinkWithCost> findRedundantEdges(List<LinkWithCost> mstEdges) {
+    	Set<LinkWithCost> newRedundantEdges = new HashSet<LinkWithCost>();
     	
     	for (LinkWithCost lt: topoEdges) {
     		LinkWithCost ltInverse = lt.getInverse();
     		if (!mstEdges.contains(lt) && !mstEdges.contains(ltInverse)) {
-    			redundantEdges.add(lt);
+    			newRedundantEdges.add(lt);
     		}
         }
     	
-    	return redundantEdges;
+    	return newRedundantEdges;
     }
     
 	protected void modPort(long switchId, short portNum, boolean open) {
@@ -162,38 +166,33 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	    	IOFSwitch sw = floodlightProvider.getAllSwitchMap().get(switchId);
 	
 	    	// Search ports for finding hardware address
-	    	// portMod.setHardwareAddress(sw.getPort(portNum).getHardwareAddress());
-	    	try {
-	    		portMod.setHardwareAddress(sw.getPort(portNum).getHardwareAddress());
-	    	} catch (Exception e) {
-	    		logger.error("Error while retrieving port hardware address from switch. Try using switch address.");
-	    		throw e;
-	    	}
+	    	portMod.setHardwareAddress(sw.getPort(portNum).getHardwareAddress());
 	
 	    	portMod.setPortNumber(portNum);
-	    	//portMod.setMask(OFPortConfig.OFPPC_PORT_DOWN.getValue());
-	    	portMod.setMask(OFPortConfig.OFPPC_NO_FLOOD.getValue());
+	    	if (CLOSE_PORT) {
+	    		portMod.setMask(OFPortConfig.OFPPC_PORT_DOWN.getValue());
+	    	} else {
+	    		portMod.setMask(OFPortConfig.OFPPC_NO_FLOOD.getValue());
+	    	}
 	    	
 	    	portMod.setConfig((open == true) ? 0 : 63);
 	    	
 	    	if (portMod.getHardwareAddress() != null) {
-	    		logger.info("Sending ModPort command to switch {} - {} port {} (hw address {}).", new Object[] { switchId, ((open == true) ? "opening" : "closing"), portNum, HexString.toHexString(portMod.getHardwareAddress())});
-	    	}
-	    	else {
-	    		logger.info("Sending ModPort command to switch {} - {} port {}.", new Object[] { switchId, ((open == true) ? "opening" : "closing"), portNum});
+	    		LOGGER.info("Sending ModPort command to switch {} - {} port {} (hw address {}).", new Object[] { switchId, (open == true) ? "opening" : "closing", portNum, HexString.toHexString(portMod.getHardwareAddress())});
+	    	} else {
+	    		LOGGER.info("Sending ModPort command to switch {} - {} port {}.", new Object[] { switchId, (open == true) ? "opening" : "closing", portNum});
 	    	}
 	    	
 	    	sw.write(portMod, null);
-		}
-		catch (Exception e) {
-			logger.error("Error while {} port {} on switch {}.", new Object[] { (open) ? "opening" : "closing", switchId, portNum }, e);
+		} catch (IOException e) {
+			LOGGER.error("Error while {} port {} on switch {}.", new Object[] { (open) ? "opening" : "closing", switchId, portNum }, e);
 		}
     }
     
 	protected String printEdges(Iterable<LinkWithCost> edges) {
     	String s  = "";
     	for (LinkWithCost e: edges) {
-    		if (!s.equals("")) {
+    		if (!"".equals(s)) {
     			s += "\n";
     		}
     		s += e.toString();
@@ -270,7 +269,6 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	@Override
 	public void setCosts(TopologyCosts newCosts) {
 		TopologyCosts costs = getCosts();
-		//costs.getCosts().clear();
 		costs.getCosts().putAll(newCosts.getCosts());
 		
 		updateLinks();

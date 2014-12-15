@@ -5,7 +5,7 @@ import it.garr.greenmst.types.LinkWithCost;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Vector;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -25,7 +25,7 @@ public abstract class GenericAlgorithmTest extends TestCase {
 	
 	@Test
 	public void testPerform() throws Exception {
-		ArrayList<LinkWithCost> allTopology = new ArrayList<LinkWithCost>();
+		List<LinkWithCost> allTopology = new ArrayList<LinkWithCost>();
 		
 		addLinkToCollection(allTopology, 1L, 1, 2L, 1, 1);
 		addLinkToCollection(allTopology, 1L, 2, 3L, 1, 4);
@@ -34,8 +34,8 @@ public abstract class GenericAlgorithmTest extends TestCase {
 		addLinkToCollection(allTopology, 2L, 3, 4L, 2, 4);
 		addLinkToCollection(allTopology, 3L, 3, 4L, 3, 1);
 		
-		Vector<LinkWithCost> mstEdges = algorithm.perform(allTopology, false);
-		Vector<LinkWithCost> reverseEdges = new Vector<LinkWithCost>();
+		List<LinkWithCost> mstEdges = algorithm.perform(allTopology, false);
+		List<LinkWithCost> reverseEdges = new ArrayList<LinkWithCost>();
 		for (LinkWithCost link : mstEdges) {
 			reverseEdges.add(link.getInverse());
 		}
@@ -72,8 +72,8 @@ public abstract class GenericAlgorithmTest extends TestCase {
 		addLinkToCollection(allTopology, 2L, 3, 4L, 2, 4);
 		addLinkToCollection(allTopology, 3L, 3, 4L, 3, 1);
 		
-		Vector<LinkWithCost> mstEdges = algorithm.perform(allTopology, true);
-		Vector<LinkWithCost> reverseEdges = new Vector<LinkWithCost>();
+		List<LinkWithCost> mstEdges = algorithm.perform(allTopology, true);
+		List<LinkWithCost> reverseEdges = new ArrayList<LinkWithCost>();
 		for (LinkWithCost link : mstEdges) {
 			reverseEdges.add(link.getInverse());
 		}

@@ -5,9 +5,6 @@ import it.garr.greenmst.TopologyCostsLoader;
 import it.garr.greenmst.web.serializers.LinkWithCostJSONSerializer;
 import net.floodlightcontroller.routing.Link;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -28,8 +25,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(using=LinkWithCostJSONSerializer.class)
 public class LinkWithCost extends Link {
     
-	protected Logger logger = LoggerFactory.getLogger(LinkWithCost.class);
-	
 	public LinkWithCost(long srcId, int srcPort, long dstId, int dstPort) {
 		super(srcId, srcPort, dstId, dstPort);
 	}
