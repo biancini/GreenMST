@@ -31,6 +31,8 @@ at the time of creation of the project.
 
 To verify everything is ok in your project, you can test the execution of tests by running ``mvn test`` from the main
 project folder. At this point the project can be imported into Eclipse and run right away.
+The project is alredy configured to be integrated with Sonarqube. A specific maven profile has been created. To send
+reports to Sonarqube execute the following commands ``mvn clean verify && mvn sonar:sonar -Psonar``.
 
 Block or turn-off ports
 -----------------------
