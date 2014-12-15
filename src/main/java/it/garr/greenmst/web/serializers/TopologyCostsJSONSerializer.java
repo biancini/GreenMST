@@ -6,7 +6,7 @@ package it.garr.greenmst.web.serializers;
 import it.garr.greenmst.types.TopologyCosts;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -35,7 +35,7 @@ public class TopologyCostsJSONSerializer extends JsonSerializer<TopologyCosts> {
     	
         jGen.writeStartObject();
         
-        HashMap<String, Integer> prop = costs.getCosts();
+        Map<String, Integer> prop = costs.getCosts();
         for (Entry<String, Integer> curProp : prop.entrySet()) {
         	jGen.writeNumberField(curProp.getKey(), curProp.getValue()); 
         }

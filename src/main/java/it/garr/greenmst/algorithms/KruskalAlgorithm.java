@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class KruskalAlgorithm implements IMinimumSpanningTreeAlgorithm {
 		
 		logger.trace("Kruskal performed on the following topoEdges: " + printEdges(topoEdges));
 		
-		HashMap<Long, HashSet<Long>> nodes = new HashMap<Long, HashSet<Long>>();
+		Map<Long, HashSet<Long>> nodes = new HashMap<Long, HashSet<Long>>();
 		
         // Generates nodes Hashmap containing one entry for each switch
         for (LinkWithCost lt: topoEdges) {
@@ -76,7 +77,7 @@ public class KruskalAlgorithm implements IMinimumSpanningTreeAlgorithm {
 	        	if (nodes.get(curEdge.getSrc()).equals(nodes.get(curEdge.getDst()))) {
 	        		logger.trace("Edge has source set equal to destination set. Not considering for MST!");
 	        	} else {
-	        		HashSet<Long> src = null, dst = null;
+	        		Set<Long> src = null, dst = null;
 	        		Long dstHashSetIndex = 0L;
 	        		
 	        		logger.trace("Comparing size of source and destination of curEdge: (src = {}, dst = {}).", new Object[] {nodes.get(curEdge.getSrc()).size(), nodes.get(curEdge.getDst()).size()});
@@ -127,15 +128,15 @@ public class KruskalAlgorithm implements IMinimumSpanningTreeAlgorithm {
     	return s;
     }
 	
-	private static String printNodes(HashMap<Long, HashSet<Long>> nodes) {
+	private static String printNodes(Map<Long, ? extends Set<Long>> nodes) {
 		String s  = "\n";
-    	for (Map.Entry<Long, HashSet<Long>> entry: nodes.entrySet()) {
+    	for (Map.Entry<Long, ? extends Set<Long>> entry: nodes.entrySet()) {
     		s += "Node (" + entry.getKey() + "): " + printHash(entry.getValue()) + "\n";
     	}
     	return s;
 	}
 	
-	private static String printHash(HashSet<Long> value) {
+	private static String printHash(Set<Long> value) {
 		String s  = "(";
 		for (Long set : value) {
 			s += set + ", ";

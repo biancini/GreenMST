@@ -4,6 +4,7 @@ import it.garr.greenmst.types.TopologyCosts;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,17 +31,23 @@ public class TopologyCostsJSONDeserializer extends JsonDeserializer<TopologyCost
 	public TopologyCosts deserialize(JsonParser jParser, DeserializationContext context)
 			throws IOException, JsonProcessingException {
 		
-		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		Map<String, Integer> map = new HashMap<String, Integer>();
 		jParser.nextToken();
         
-        if (jParser.getCurrentToken() != JsonToken.START_OBJECT) throw new IOException("Expected START_OBJECT");
+        if (jParser.getCurrentToken() != JsonToken.START_OBJECT) {
+        	throw new IOException("Expected START_OBJECT");
+        }
 
         while (jParser.nextToken() != JsonToken.END_OBJECT) {
-            if (jParser.getCurrentToken() != JsonToken.FIELD_NAME) throw new IOException("Expected FIELD_NAME");
+            if (jParser.getCurrentToken() != JsonToken.FIELD_NAME) {
+            	throw new IOException("Expected FIELD_NAME");
+            }
 
             String name = jParser.getCurrentName();
             jParser.nextToken();
-            if (jParser.getText().equals("")) continue;
+            if (jParser.getText().equals("")) {
+            	continue;
+            }
             Integer value = Integer.parseInt(jParser.getText());
             
             map.put(name, value);

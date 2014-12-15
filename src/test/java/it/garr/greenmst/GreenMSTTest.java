@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import net.floodlightcontroller.core.FloodlightContext;
@@ -53,7 +54,6 @@ public class GreenMSTTest extends FloodlightTestCase {
     }
 	
 	@Test
-	@SuppressWarnings("deprecation")
 	public void testUpdateLinks() throws Exception {
 		Map<Long, IOFSwitch> switches = new HashMap<Long, IOFSwitch>();
 		Map<Long, Vector<byte[]>> hwAddrsSw = new HashMap<Long, Vector<byte[]>>();
@@ -129,7 +129,7 @@ public class GreenMSTTest extends FloodlightTestCase {
 		addLinkToCollection(mstEdges, 1L, 3, 4L, 1, 2);
 		addLinkToCollection(mstEdges, 3L, 3, 4L, 3, 1);
 		
-		HashSet<LinkWithCost> redundantEdges = greenMST.findRedundantEdges(mstEdges);
+		Set<LinkWithCost> redundantEdges = greenMST.findRedundantEdges(mstEdges);
 		
 		HashSet<LinkWithCost> expectedRedundantEdges = new HashSet<LinkWithCost>();
 		addLinkToCollection(expectedRedundantEdges, 1L, 2, 3L, 1, 4);
@@ -163,7 +163,6 @@ public class GreenMSTTest extends FloodlightTestCase {
 		logger.info("Ended testModPortClose.");
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void testModPort(boolean open) throws Exception {
 		Map<Long, IOFSwitch> switches = new HashMap<Long, IOFSwitch>();
 		Capture<OFPortMod> msgCapture = new Capture<OFPortMod>();
@@ -203,7 +202,6 @@ public class GreenMSTTest extends FloodlightTestCase {
         topoEdges.add(link.getInverse());
 	}
 	
-	@SuppressWarnings("deprecation")
 	private IOFSwitch createSwitch(long switchId, List<Short> portNums, List<byte[]> hwAddrs, Capture<OFPortMod> msgCapture) throws Exception {
         final List<ImmutablePort> ports = new Vector<ImmutablePort>();
         

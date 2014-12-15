@@ -58,8 +58,8 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	protected ITopologyService topology = null;
 	
 	// Data structures for caching algorithm results
-	protected HashSet<LinkWithCost> topoEdges = new HashSet<LinkWithCost>();
-	protected HashSet<LinkWithCost> redundantEdges = new HashSet<LinkWithCost>();
+	protected Set<LinkWithCost> topoEdges = new HashSet<LinkWithCost>();
+	protected Set<LinkWithCost> redundantEdges = new HashSet<LinkWithCost>();
 	
 	private IMinimumSpanningTreeAlgorithm algorithm = new KruskalAlgorithm();
 	
@@ -95,11 +95,11 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	
 	protected void updateLinks() {
 		logger.debug("Updating MST because of topology change...");
-		HashSet<LinkWithCost> oldRedundantEdges = this.redundantEdges,
-							  newRedundantEdges = null;
+		Set<LinkWithCost> oldRedundantEdges = this.redundantEdges,
+						  newRedundantEdges = null;
 		
         try {
-        	ArrayList<LinkWithCost> allTopology = new ArrayList<LinkWithCost>(topoEdges);
+        	List<LinkWithCost> allTopology = new ArrayList<LinkWithCost>(topoEdges);
         	//allTopology.addAll(oldRedundantEdges);
         	Vector<LinkWithCost> mstEdges = algorithm.perform(allTopology);
         	logger.trace("mstEdges = {}.", new Object[] { printEdges(mstEdges) });
@@ -143,8 +143,8 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
         logger.trace("New redundantEdges = {}.", new Object[] { printEdges(redundantEdges) });
     }
 	
-	protected HashSet<LinkWithCost> findRedundantEdges(Vector<LinkWithCost> mstEdges) {
-    	HashSet<LinkWithCost> redundantEdges = new HashSet<LinkWithCost>();
+	protected Set<LinkWithCost> findRedundantEdges(Vector<LinkWithCost> mstEdges) {
+    	Set<LinkWithCost> redundantEdges = new HashSet<LinkWithCost>();
     	
     	for (LinkWithCost lt: topoEdges) {
     		LinkWithCost ltInverse = lt.getInverse();
@@ -176,8 +176,12 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	    	
 	    	portMod.setConfig((open == true) ? 0 : 63);
 	    	
-	    	if (portMod.getHardwareAddress() != null) logger.info("Sending ModPort command to switch {} - {} port {} (hw address {}).", new Object[] { switchId, ((open == true) ? "opening" : "closing"), portNum, HexString.toHexString(portMod.getHardwareAddress())});
-	    	else logger.info("Sending ModPort command to switch {} - {} port {}.", new Object[] { switchId, ((open == true) ? "opening" : "closing"), portNum});
+	    	if (portMod.getHardwareAddress() != null) {
+	    		logger.info("Sending ModPort command to switch {} - {} port {} (hw address {}).", new Object[] { switchId, ((open == true) ? "opening" : "closing"), portNum, HexString.toHexString(portMod.getHardwareAddress())});
+	    	}
+	    	else {
+	    		logger.info("Sending ModPort command to switch {} - {} port {}.", new Object[] { switchId, ((open == true) ? "opening" : "closing"), portNum});
+	    	}
 	    	
 	    	sw.write(portMod, null);
 		}
@@ -189,7 +193,9 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	protected String printEdges(Iterable<LinkWithCost> edges) {
     	String s  = "";
     	for (LinkWithCost e: edges) {
-    		if (!s.equals("")) s += "\n";
+    		if (!s.equals("")) {
+    			s += "\n";
+    		}
     		s += e.toString();
     	}
     	return s;
@@ -227,8 +233,12 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 
 	@Override
 	public void startUp(FloodlightModuleContext context) {
-		if (topology != null) topology.addListener(this);
-		if (restApi != null) restApi.addRestletRoutable(new GreenMSTWebRoutable());
+		if (topology != null) {
+			topology.addListener(this);
+		}
+		if (restApi != null) {
+			restApi.addRestletRoutable(new GreenMSTWebRoutable());
+		}
 	}
 	
 	@Override
@@ -236,14 +246,13 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 		return topoEdges;
 	}
 	
-	protected void setTopoEdges(HashSet<LinkWithCost> topoEdges) {
+	protected void setTopoEdges(Set<LinkWithCost> topoEdges) {
 		this.topoEdges = topoEdges;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
     public Set<LinkWithCost> getMSTEdges(){
-		HashSet<LinkWithCost> mstEdges = (HashSet<LinkWithCost>) topoEdges.clone();
+		Set<LinkWithCost> mstEdges = new HashSet<LinkWithCost>(topoEdges);
 		mstEdges.removeAll(redundantEdges);
     	return mstEdges;
     }

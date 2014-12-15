@@ -53,6 +53,16 @@ public class LinkWithCost extends Link {
 	public boolean equals(Object obj) {
 		return super.equals(obj);
 	}
+	
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+	
+	@Override
+	public int compareTo(Link a) {
+		return super.compareTo(a);
+	}
 
 	@Override
 	public String toString() {

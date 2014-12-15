@@ -6,6 +6,7 @@ import it.garr.greenmst.web.serializers.TopologyCostsJSONSerializer;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -20,7 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class TopologyCosts {
 	
 	protected static Logger logger = LoggerFactory.getLogger(TopologyCosts.class);
-	private static HashMap<String, Integer> costs = new HashMap<String, Integer>();
+	private static Map<String, Integer> costs = new HashMap<String, Integer>();
 	public static final int DEFAULT_COST = 1;
 	
 	public TopologyCosts() {
@@ -40,38 +41,50 @@ public class TopologyCosts {
 		}
 	}
 	
-	public void setCostsValues(HashMap<String, Integer> map) {
+	public void setCostsValues(Map<String, Integer> map) {
 		//costs.clear();
 		costs.putAll(map);
 	}
 	
-	public HashMap<String, Integer> getCosts() {
+	public Map<String, Integer> getCosts() {
 		return costs;
 	}
 	
 	public void setCost(long source, long destination, int cost) {
 		if (costs != null) {
-			if (costs.get(source + "," + destination) != null) costs.put(source + "," + destination, cost);
-			if (costs.get(destination + "," + source) != null) costs.put(destination + "," + source, cost);
+			if (costs.get(source + "," + destination) != null) {
+				costs.put(source + "," + destination, cost);
+			}
+			if (costs.get(destination + "," + source) != null) {
+				costs.put(destination + "," + source, cost);
+			}
 		}
 	}
 	
 	public int getCost(long source, long destination) {
 		if (costs != null) {
 			Integer sCost = costs.get(source + "," + destination);
-			if (sCost == null) sCost = costs.get(destination + "," + source);
-			if (sCost != null) return sCost;
+			if (sCost == null) {
+				sCost = costs.get(destination + "," + source);
+			}
+			if (sCost != null) {
+				return sCost;
+			}
 		}
 		
 		return DEFAULT_COST;
 	}
 	
 	public String toString() {
-		if (costs == null) return "(null)";
+		if (costs == null) {
+			return "(null)";
+		}
 		
 		String s = "";
 		for (Entry<String, Integer> curProp: costs.entrySet()) {
-			if (!s.equals("")) s += "\n";
+			if (!s.equals("")) {
+				s += "\n";
+			}
 			s += curProp.getKey() + " => " + curProp.getValue();
 		}
 		return s;
