@@ -1,11 +1,9 @@
 *.class
 
-# Package Files #
-*.jar
-*.war
-*.ear
-
 bin/*
 floodlight-src
 floodlight-test-src
 /bin
+/target
+
+.settings

@@ -1,1 +1,1 @@
-src/logback.xml
+src/main/resources/logback.xml

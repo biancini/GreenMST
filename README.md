@@ -24,10 +24,13 @@ Information can be found here:
 Installation and configuration
 ==============================
 
-This project has been developed and tested on Floodlight v0.90. After its installation the ``floodlight.jar``
-must be copied within the root folder of this project.
+This project has been developed and tested on Floodlight master version. After its installation the ``floodlight.jar`` and
+``floodlight-test.jar`` files must be copied withint the lib folder of this project. These jars will be used as dependencies
+to the maven repository. The current repository has these two files compiled from the master release of floodlight
+at the time of creation of the project.
 
-At this point the project can be imported into Eclipse and run right away.
+To verify everything is ok in your project, you can test the execution of tests by running ``mvn test`` from the main
+project folder. At this point the project can be imported into Eclipse and run right away.
 
 Block or turn-off ports
 -----------------------
