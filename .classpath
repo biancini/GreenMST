@@ -27,7 +27,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/floodlight.jar"/>
-	<classpathentry kind="lib" path="lib/floodlight-test.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
