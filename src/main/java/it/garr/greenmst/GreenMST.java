@@ -69,12 +69,6 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 		for (LDUpdate update : linkUpdates) {
 			LOGGER.trace("Received topology update event {}.", update);
 			
-			// Consider only link removed and link updated events, discard all others.
-			if (!update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_REMOVED) &&
-					!update.getOperation().equals(ILinkDiscovery.UpdateOperation.LINK_UPDATED)) {
-				return;
-			}
-			
 			LinkWithCost link = new LinkWithCost(update.getSrc(), update.getSrcPort(), update.getDst(), update.getDstPort());
 			LOGGER.trace("Considering link {}.", link);
 			
@@ -94,6 +88,8 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	                topoEdges.add(link);
 	                updateLinks();
 	            }
+			} else {
+				// Do nothing
 			}
 		}
 	}

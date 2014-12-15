@@ -27,39 +27,11 @@ public class KruskalAlgorithm implements IMinimumSpanningTreeAlgorithm {
 	// KRUSKAL ALGORITHM -- COLUMBIA UNIV. IMPL.
     public List<LinkWithCost> perform(List<LinkWithCost> topoEdges, boolean reverse) throws AlgorithmException {
 		LOGGER.debug("Starting to perform Kruskal algorithm...");
-		
-		if (reverse) {
-			Collections.sort(topoEdges, new Comparator<LinkWithCost>() {
-				public int compare(LinkWithCost link1, LinkWithCost link2) {
-					return new Integer(link2.getCost()).compareTo(link1.getCost());
-				}
-			});
-		} else {
-			Collections.sort(topoEdges, new Comparator<LinkWithCost>() {
-				public int compare(LinkWithCost link1, LinkWithCost link2) {
-					return new Integer(link1.getCost()).compareTo(link2.getCost());
-				}
-			});
-		}
-		
+		sortLinks(topoEdges, reverse);
 		LOGGER.trace("Kruskal performed on the following topoEdges: " + printEdges(topoEdges));
 		
 		Map<Long, HashSet<Long>> nodes = new HashMap<Long, HashSet<Long>>();
-		
-        // Generates nodes Hashmap containing one entry for each switch
-        for (LinkWithCost lt: topoEdges) {
-            if (!nodes.containsKey(lt.getSrc())) {
-            	// Create set of connect components [singleton] for this node
-                nodes.put(lt.getSrc(), new HashSet<Long>());
-                nodes.get(lt.getSrc()).add(lt.getSrc());
-            }
-            
-            if (!nodes.containsKey(lt.getDst())) {
-            	// Create set of connect components [singleton] for this node
-                nodes.put(lt.getDst(), new HashSet<Long>());
-                nodes.get(lt.getDst()).add(lt.getDst());
-            }
-        }
+        generateNodeHashmap(topoEdges, nodes);
         
         LOGGER.trace("Kruskal generated the following nodes structure: " + printNodes(nodes));
     	
@@ -120,6 +92,39 @@ public class KruskalAlgorithm implements IMinimumSpanningTreeAlgorithm {
     	
     	return mstEdges;
     }
+
+	private void generateNodeHashmap(List<LinkWithCost> topoEdges,
+			Map<Long, HashSet<Long>> nodes) {
+		for (LinkWithCost lt: topoEdges) {
+            if (!nodes.containsKey(lt.getSrc())) {
+            	// Create set of connect components [singleton] for this node
+                nodes.put(lt.getSrc(), new HashSet<Long>());
+                nodes.get(lt.getSrc()).add(lt.getSrc());
+            }
+            
+            if (!nodes.containsKey(lt.getDst())) {
+            	// Create set of connect components [singleton] for this node
+                nodes.put(lt.getDst(), new HashSet<Long>());
+                nodes.get(lt.getDst()).add(lt.getDst());
+            }
+        }
+	}
+
+	private void sortLinks(List<LinkWithCost> topoEdges, boolean reverse) {
+		if (reverse) {
+			Collections.sort(topoEdges, new Comparator<LinkWithCost>() {
+				public int compare(LinkWithCost link1, LinkWithCost link2) {
+					return new Integer(link2.getCost()).compareTo(link1.getCost());
+				}
+			});
+		} else {
+			Collections.sort(topoEdges, new Comparator<LinkWithCost>() {
+				public int compare(LinkWithCost link1, LinkWithCost link2) {
+					return new Integer(link1.getCost()).compareTo(link2.getCost());
+				}
+			});
+		}
+	}
 	
 	private static String printEdges(Iterable<LinkWithCost> edges) {
     	String s  = "\n";
