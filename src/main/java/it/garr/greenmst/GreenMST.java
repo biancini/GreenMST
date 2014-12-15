@@ -1,5 +1,6 @@
 package it.garr.greenmst;
 
+import it.garr.greenmst.algorithms.AlgorithmException;
 import it.garr.greenmst.algorithms.IMinimumSpanningTreeAlgorithm;
 import it.garr.greenmst.algorithms.KruskalAlgorithm;
 import it.garr.greenmst.types.LinkWithCost;
@@ -89,7 +90,7 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	                updateLinks();
 	            }
 			} else {
-				// Do nothing
+				LOGGER.trace("Event not considered, so ignore it {}.", update);
 			}
 		}
 	}
@@ -109,7 +110,7 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
         	LOGGER.trace("newRedundantEdges = {}.", new Object[] { printEdges(newRedundantEdges) });
             // redundantEdges contains edges to be closed according to Kruskal
             // (ie edges in topoEdges but not present in mstEdges, edges not in MSP and not already closed)
-        } catch (Exception e) {
+        } catch (AlgorithmException e) {
             LOGGER.error("Error calculating MST with Kruskal ", e);
         }
         
@@ -172,12 +173,7 @@ public class GreenMST implements IFloodlightModule, IGreenMSTService, ITopologyL
 	    	}
 	    	
 	    	portMod.setConfig((open == true) ? 0 : 63);
-	    	
-	    	if (portMod.getHardwareAddress() != null) {
-	    		LOGGER.info("Sending ModPort command to switch {} - {} port {} (hw address {}).", new Object[] { switchId, (open == true) ? "opening" : "closing", portNum, HexString.toHexString(portMod.getHardwareAddress())});
-	    	} else {
-	    		LOGGER.info("Sending ModPort command to switch {} - {} port {}.", new Object[] { switchId, (open == true) ? "opening" : "closing", portNum});
-	    	}
+	    	LOGGER.info("Sending ModPort command to switch {} - {} port {} (hw address {}).", new Object[] { switchId, (open == true) ? "opening" : "closing", portNum, HexString.toHexString(portMod.getHardwareAddress())});
 	    	
 	    	sw.write(portMod, null);
 		} catch (IOException e) {

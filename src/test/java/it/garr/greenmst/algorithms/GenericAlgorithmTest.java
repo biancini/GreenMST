@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class GenericAlgorithmTest extends TestCase {
 	
-	protected static Logger logger = LoggerFactory.getLogger(GenericAlgorithmTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GenericAlgorithmTest.class);
 	
 	IMinimumSpanningTreeAlgorithm algorithm = null;
 
@@ -58,7 +58,7 @@ public abstract class GenericAlgorithmTest extends TestCase {
 			}
 		}
 		
-		logger.info("Ended testPerform.");
+		LOGGER.info("Ended testPerform.");
 	}
 	
 	@Test
@@ -96,16 +96,16 @@ public abstract class GenericAlgorithmTest extends TestCase {
 			}
 		}
 		
-		logger.info("Ended testPerform.");
+		LOGGER.info("Ended testPerform.");
 	}
 	
 	protected void addLinkToCollection(Collection<LinkWithCost> topoEdges, long switchFrom, int portFrom, long switchTo, int portTo, int cost) {
 		LinkWithCost link = new LinkWithCost(switchFrom, portFrom, switchTo, portTo, cost);
 		
-		logger.debug("Link added: {}.", new Object[] { link });
+		LOGGER.debug("Link added: {}.", new Object[] { link });
         topoEdges.add(link);
         
-        logger.debug("Link added: {}.", new Object[] { link.getInverse() });
+        LOGGER.debug("Link added: {}.", new Object[] { link.getInverse() });
         topoEdges.add(link.getInverse());
 	}
 }

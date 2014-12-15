@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 
 public class KruskalAlgorithmTest extends GenericAlgorithmTest {
 	
-	protected static Logger logger = LoggerFactory.getLogger(KruskalAlgorithmTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(KruskalAlgorithmTest.class);
 
 	@Before
     public void setUp() throws Exception { 
 		algorithm = new KruskalAlgorithm();
-        logger.info("Ended startUp.");
+        LOGGER.info("Ended startUp.");
     }
 	
 }

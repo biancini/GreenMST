@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class GreenMSTTest extends FloodlightTestCase {
 	
-	protected static Logger logger = LoggerFactory.getLogger(GreenMSTTest.class);
+	protected static Logger LOGGER = LoggerFactory.getLogger(GreenMSTTest.class);
 	protected GreenMST greenMST = null;
 	
 	@Before
@@ -50,7 +50,7 @@ public class GreenMSTTest extends FloodlightTestCase {
 		context.addService(IFloodlightProviderService.class, mockFloodlightProvider);
         
 		greenMST.init(context);
-        logger.info("Ended startUp.");
+        LOGGER.info("Ended startUp.");
     }
 	
 	@Test
@@ -112,7 +112,7 @@ public class GreenMSTTest extends FloodlightTestCase {
 		verifyPortMod(msgCaptures.get(3L).getValue(), hwAddrsSw.get(3L).get(0), (short) 1, 63);
 		verifyPortMod(msgCaptures.get(4L).getValue(), hwAddrsSw.get(4L).get(1), (short) 2, 63);
 		
-		logger.info("Ended testUpdateLinks.");
+		LOGGER.info("Ended testUpdateLinks.");
 	}
 	
 	@Test
@@ -148,19 +148,19 @@ public class GreenMSTTest extends FloodlightTestCase {
 			}
 		}
 		
-		logger.info("Ended testFindRedundantEdges.");
+		LOGGER.info("Ended testFindRedundantEdges.");
 	}
 	
 	@Test
 	public void testModPortOpen() throws Exception {
 		testModPort(true);
-		logger.info("Ended testModPortOpen.");
+		LOGGER.info("Ended testModPortOpen.");
 	}
 	
 	@Test
 	public void testModPortClose() throws Exception {
 		testModPort(false);
-		logger.info("Ended testModPortClose.");
+		LOGGER.info("Ended testModPortClose.");
 	}
 	
 	private void testModPort(boolean open) throws Exception {
@@ -195,10 +195,10 @@ public class GreenMSTTest extends FloodlightTestCase {
 	private void addLinkToCollection(Collection<LinkWithCost> topoEdges, long switchFrom, int portFrom, long switchTo, int portTo, int cost) {
 		LinkWithCost link = new LinkWithCost(switchFrom, portFrom, switchTo, portTo, cost);
 		
-		logger.debug("Link added: {}.", new Object[] { link });
+		LOGGER.debug("Link added: {}.", new Object[] { link });
         topoEdges.add(link);
         
-        logger.debug("Link added: {}.", new Object[] { link.getInverse() });
+        LOGGER.debug("Link added: {}.", new Object[] { link.getInverse() });
         topoEdges.add(link.getInverse());
 	}
 	

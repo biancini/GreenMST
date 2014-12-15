@@ -13,16 +13,16 @@ import org.slf4j.LoggerFactory;
 @RunWith(Suite.class)
 @SuiteClasses({ KruskalAlgorithmTest.class })
 public class GreenMSTAlgorithmSuite {
-	protected static Logger logger = LoggerFactory.getLogger(GreenMSTTestSuite.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GreenMSTTestSuite.class);
 
     @BeforeClass 
     public static void setUpClass() {
-    	logger.info("Test suite setup.");
+    	LOGGER.info("Test suite setup.");
 
     }
 
     @AfterClass
     public static void tearDownClass() {
-    	logger.info("Test suite end.");
+    	LOGGER.info("Test suite end.");
     }
 }
