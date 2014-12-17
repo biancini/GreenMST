@@ -43,21 +43,6 @@ public class LinkWithCost extends Link {
 		TopologyCosts costs = TopologyCostsLoader.getTopologyCosts();
 		return costs.getCost(this.getSrc(), this.getDst());
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-	
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-	
-	@Override
-	public int compareTo(Link a) {
-		return super.compareTo(a);
-	}
 
 	@Override
 	public String toString() {
