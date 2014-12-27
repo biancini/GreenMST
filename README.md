@@ -1,7 +1,5 @@
-GreenMST floodlight module
+GreenMST floodlight module [![Build Status](https://travis-ci.org/biancini/GreenMST.svg?branch=master)](https://travis-ci.org/biancini/GreenMST)
 ==========================
-
-[![Build Status](https://travis-ci.org/biancini/GreenMST.svg?branch=master)](https://travis-ci.org/biancini/GreenMST) [![Coverage Status](https://coveralls.io/repos/biancini/GreenMST/badge.png)](https://coveralls.io/r/biancini/GreenMST)
 
 Implementation of module for Floodligth which implements a MST over a network.
 The Floodlight controller implements the Openflow protocol, which specifications can be found here:
