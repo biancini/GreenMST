@@ -1,4 +1,4 @@
-GreenMST floodlight module [![Build Status](https://travis-ci.org/biancini/GreenMST.svg?branch=master)](https://travis-ci.org/biancini/GreenMST)
+GreenMST floodlight module [![Build Status](https://travis-ci.org/biancini/GreenMST.svg?branch=master)](https://travis-ci.org/biancini/GreenMST) [![Coverage Status](https://coveralls.io/repos/biancini/GreenMST/badge.png?branch=master)](https://coveralls.io/r/biancini/GreenMST?branch=master)
 ==========================
 
 Implementation of module for Floodligth which implements a MST over a network.
